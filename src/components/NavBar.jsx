@@ -31,12 +31,12 @@ const NavBar = () => {
             <div className="dropdown dropdown-end">
             {user && (
             <div className="flex items-center">
-                <p>Wellcome {user?.user?.firstName}!</p>           
+                <p>Wellcome {user?.firstName}!</p>           
             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar mx-5">                
                 <div className="w-10 rounded-full">               
                 <img
                     alt="Tailwind CSS Navbar component"
-                    src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />                
+                    src={user?.photoUrl || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"} />                
                 </div>                
             </div>
              </div>
