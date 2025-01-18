@@ -1,13 +1,14 @@
 import axios from "axios";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addUser } from "./utils/userSlice";
+import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
-import { BASE_URL } from "./utils/constants";
+import { BASE_URL } from "../utils/constants";
 
 const Login = () => {
     const [emailId, setEmailId] = useState("t21425814@gmail.com")
     const [password, setPassword] = useState("LsT@00000")
+    const [error, setError] = useState("")
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -20,7 +21,7 @@ const Login = () => {
             dispatch(addUser(res.data))
             return navigate("/")
         }catch(err){
-            console.log(err)
+            setError(err?.response?.data)
         }
     }
 
@@ -52,6 +53,7 @@ const Login = () => {
                             />
                         </div>
                         <div className="card-actions justify-center">
+                            <p className="text-red-700">{error}</p>
                             <button className="btn btn-primary" onClick={handleLogin}>
                                 Submit
                             </button>

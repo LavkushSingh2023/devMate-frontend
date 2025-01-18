@@ -4,8 +4,8 @@ import Footer from "./Footer"
 import { useDispatch, useSelector } from "react-redux"
 import { useEffect } from "react"
 import axios from "axios"
-import { BASE_URL } from "./utils/constants"
-import {addUser} from "./utils/userSlice"
+import { BASE_URL } from "../utils/constants"
+import {addUser} from "../utils/userSlice"
 
 const Body = () => {
     const dispatch = useDispatch()
@@ -32,9 +32,13 @@ const Body = () => {
 
     return(
         <>
-            <NavBar/>
-            <Outlet/>
-            <Footer/>
+            <div className="min-h-screen flex flex-col">
+                <NavBar />
+            <div className="flex-grow">
+                <Outlet />
+            </div>
+                <Footer />
+            </div>
         </>
     )
 }
