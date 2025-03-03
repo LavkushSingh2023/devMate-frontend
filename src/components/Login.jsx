@@ -1,68 +1,70 @@
+import { Link, useNavigate } from "react-router-dom";
+import { hide } from "../utils/showLoginSlice";
+import { useDispatch } from "react-redux";
 import axios from "axios";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { addUser } from "../utils/userSlice";
-import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 
 const Login = () => {
-    const [emailId, setEmailId] = useState("t21425814@gmail.com")
-    const [password, setPassword] = useState("LsT@00000")
-    const [error, setError] = useState("")
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
 
-    const handleLogin = async () => {
-        try{
-            const res = await axios.post(BASE_URL + "/login", {
-                emailId,
-                password
-            }, {withCredentials: true})
-            dispatch(addUser(res?.data?.user))
-            return navigate("/")
-        }catch(err){
-            setError(err?.response?.data)
+  async function handleSubmit(e){
+        e.preventDefault();
+        try {
+            const response = await axios.post(BASE_URL + "/login", {email, password}, {withCredentials: true});
+            console.log(response.data.message)
+            dispatch(hide());
+            navigate("/");
+        } catch (error) {
+            console.log("❌ Error logging in:", error.response?.data || error.message);
         }
     }
 
-    return (
-        <>
-            <div className="flex justify-center">
-                <div className="card bg-base-100 image-full w-96 shadow-xl">
-                    <div className="card-body">
-                        <h2 className="card-title flex justify-center">LogIn</h2>
-                        <div>
-                            <label htmlFor="emailId">EmailId</label>
-                            <br />
-                            <input
-                                type="text"
-                                id="emailId"
-                                className="m-2 p-2 rounded"
-                                value={emailId} 
-                                onChange={(e) => setEmailId(e.target.value)}
-                            />
-                            <br />
-                            <label htmlFor="password">Password</label>
-                            <br />
-                            <input
-                                type="password"
-                                id="password"
-                                className="m-2 p-2 rounded"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                        <div className="card-actions justify-center">
-                            <p className="text-red-700">{error}</p>
-                            <button className="btn btn-primary" onClick={handleLogin}>
-                                Submit
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
-    );
+  return (
+    <div className="flex justify-center items-center bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white">
+      <div className="bg-black shadow-2xl rounded-xl m-8 p-8 w-96">
+        <h2 className="text-3xl font-bold text-center text-white mb-6">Log In</h2>
+        <form onSubmit={handleSubmit}>      
+        <div className="mb-4">
+          <label htmlFor="emailId" className="block text-white font-semibold">Email</label>
+          <input
+            type="text"
+            id="emailId"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-2 mt-1 border bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          />
+        </div>
+
+        <div className="mb-6">
+          <label htmlFor="password" className="block text-white font-semibold">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-2 mt-1 border bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          />
+        </div>
+
+        <div className="text-center">
+          <button type="submit" className="w-full px-6 py-3 text-lg font-semibold text-white bg-gradient-to-r from-pink-500 to-red-500 hover:from-red-500 hover:to-pink-500 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+            Submit
+          </button>
+        </div>
+        </form>  
+
+        <p className="mt-4 text-center text-gray-300">
+          Don't have an account? <Link to="/signup" className="text-blue-400 hover:underline">Sign up</Link>
+        </p>
+      </div>
+    </div>
+  );
 };
 
 export default Login;

@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from "react-router-dom"
-import NavBar from "./NavBar"
+import Navbar from "./Navbar"
 import Footer from "./Footer"
 import { useDispatch, useSelector } from "react-redux"
 import { useEffect } from "react"
@@ -33,7 +33,7 @@ const Body = () => {
     return(
         <>
             <div className="min-h-screen flex flex-col">
-                <NavBar />
+                <Navbar />
             <div className="flex-grow">
                 <Outlet />
             </div>

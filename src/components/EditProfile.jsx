@@ -1,104 +1,111 @@
-import { useState } from "react"
-import UserCard from "./UserCard"
-import axios from "axios"
-import { useDispatch } from "react-redux"
-import {BASE_URL} from "../utils/constants"
-import { addUser } from "../utils/userSlice"
-import { useNavigate } from "react-router-dom"
+import { useState } from "react";
+import axios from "axios";
+import { Camera, Save } from "lucide-react";
+import { useDispatch} from "react-redux";
+import { toggleProfile } from "../utils/showProfileSlice";
+import { BASE_URL } from "../utils/constants";
 
-const EditProfile = ({user}) => {
-    const [firstName, setFirstName] = useState(user.firstName)
-    const [lastName, setLastName] = useState(user.lastName)
-    const [photoUrl, setPhotoUrl] = useState(user.photoUrl)
-    const [Age, setAge] = useState(user.Age)
-    const [gender, setGender] = useState(user.gender)    
-    const [error, setError] = useState("")
+const UpdateProfile = ({ user }) => {
+  const dispatch = useDispatch()
 
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
+  const [formData, setFormData] = useState({
+    name: user?.name || "",
+    role: user?.role || "",
+    bio: user?.bio || "",
+    avatar: user?.avatar || "",
+    skills: user?.skills || "",
+    rating: user?.rating || "",
+  });
 
-    const saveProfile = async () => {
-        try{
-            setError("")
-            const res = await axios.patch(BASE_URL + "/profile/edit", 
-                {firstName, lastName, Age, gender, photoUrl},
-                {withCredentials: true}
-            )
-            dispatch(addUser(res?.data?.["Updated User"]))
-            return navigate("/profile")
-        }catch(err){
-            console.log("ERROR in saving data: " + err)
-            setError("Failed to save profile. Please try again.");
-        }
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.patch(BASE_URL + "/profile/edit", formData, { withCredentials: true });
+      dispatch(toggleProfile())
+    } catch (error) {
+      console.log("Error updating profile:", error.response?.data || error.message);
     }
+  };
 
-    return (
-        <div className="flex justify-center my-16">
-            <div className="flex justify-center ">
-                <div className="card bg-base-100 image-full w-96 shadow-xl m-5">
-                    <div className="card-body">
-                        <h2 className="card-title flex justify-center">Edit Profile</h2>
-                        <div>
-                            <label htmlFor="firstName">firstName</label>
-                            <br />
-                            <input
-                                type="text"
-                                id="firstName"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                className="m-2 p-2 rounded"
-                            />
-                            <br />
-                            <label htmlFor="text">lastName</label>
-                            <br />
-                            <input
-                                type="text"
-                                id="lastName"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                                className="m-2 p-2 rounded"
-                            />
-                            <br />                        
-                            <label htmlFor="text">photo URL</label>
-                            <br />
-                            <input
-                                type="text"   
-                                value={photoUrl}
-                                onChange={(e) => setPhotoUrl(e.target.value)}                             
-                                className="m-2 p-2 rounded"
-                            />
-                            <br />
-                            <label htmlFor="text">Age</label>
-                            <br />
-                            <input
-                                type="number"
-                                value={Age}
-                                onChange={(e) => setAge(e.target.value)}
-                                className="m-2 p-2 rounded"
-                            />
-                            <br />
-                            <label htmlFor="text">gender</label>
-                            <br />
-                            <select name="gender" id="" value={gender} onChange={(e) => setGender(e.target.value)} className="m-2 p-2 rounded">
-                                <option value="male">male</option>
-                                <option value="female">female</option>
-                                <option value="others">others</option>
-                            </select>
-                        </div>
-                        <div className="card-actions justify-center">
-                            <p className="text-red-700">{error}</p>
-                            <button className="btn btn-primary" onClick={saveProfile}>
-                                Save Profile
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="m-5">
-                <UserCard user={{firstName, lastName, photoUrl, Age, gender}}/>
-            </div>            
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl mt-12">
+      <div className="bg-black shadow-2xl rounded-xl m-8 p-8 w-full max-w-3xl">
+        {/* Header */}
+        <h2 className="text-3xl font-bold text-center text-white mb-6">Update Profile</h2>
+
+        {/* Profile Image Section */}
+        <div className="flex flex-col items-center">
+          <div className="relative group">
+            <img
+              src={formData.avatar || "https://via.placeholder.com/100"}
+              alt="Avatar"
+              className="w-32 h-32 rounded-full border-4 border-blue-500 shadow-lg transition-transform duration-300 group-hover:scale-105"
+            />
+            <label className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer transition-transform duration-300 group-hover:scale-110">
+              <Camera className="w-5 h-5" />
+              <input
+                type="text"
+                name="avatar"
+                value={formData.avatar}
+                onChange={handleChange}
+                className="hidden"
+              />
+            </label>
+          </div>
+          <p className="text-gray-400 text-sm mt-2">Click to update avatar URL</p>
         </div>
-    )
-}
-      
-export default EditProfile
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[
+            { label: "Name", name: "name", type: "text" },
+            { label: "Role", name: "role", type: "text" },
+            { label: "Bio", name: "bio", type: "textarea" },
+            { label: "Skills", name: "skills", type: "text", placeholder: "e.g., React, Node.js" },
+            { label: "Rating", name: "rating", type: "number", min: 0, max: 5, step: 0.1 }
+          ].map(({ label, name, type, ...rest }) => (
+            <div key={name}>
+              <label className="block text-white font-semibold">{label}</label>
+              {type === "textarea" ? (
+                <textarea
+                  name={name}
+                  value={formData[name]}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 mt-1 border border-gray-700 bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-400 placeholder-gray-400"
+                  {...rest}
+                ></textarea>
+              ) : (
+                <input
+                  type={type}
+                  name={name}
+                  value={formData[name]}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 mt-1 border border-gray-700 bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-400 placeholder-gray-400"
+                  {...rest}
+                />
+              )}
+            </div>
+          ))}
+        </form>
+
+        {/* Submit Button */}
+        <div className="mt-8 flex justify-center">
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            className="flex items-center px-8 py-3 text-lg font-semibold text-white bg-gradient-to-r from-pink-500 to-red-500 hover:from-red-500 hover:to-pink-500 rounded-lg shadow-lg transition-transform transform hover:scale-105"
+          >
+            <Save className="w-5 h-5 mr-2" />
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default UpdateProfile;
