@@ -60,8 +60,12 @@ export default function UserCard() {
   }, [showLogin])
 
   useEffect(() => {
-    let filterUser = profiles.filter(user => user.name.toLowerCase().includes(search.toLowerCase()))
-    setFilterProfiles(filterUser)
+    try{
+        let filterUser = profiles.filter(user => user.name.toLowerCase().includes(search.toLowerCase()))
+        setFilterProfiles(filterUser)
+    }catch(error){
+        console.error("Error in searching: ", error.message)
+    }
   }, [search])
 
   const handleSwipe = (direction) => {
