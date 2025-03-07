@@ -49,12 +49,12 @@ export default function UserProfileDropdown({ show }) {
 
       {/* Menu Items */}
       <div className="p-2">
-        <button className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
+        <button onClick={() => navigate("/connectionRequests")} className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
           <UserPlus className="w-5 h-5 text-white" />
           <span>Connection Requests</span>
           <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">3</span>
         </button>
-        <button className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
+        <button onClick={() => navigate("/myConnections")} className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
           <Users className="w-5 h-5 text-white" />
           <span>Your Connections</span>
         </button>
@@ -62,11 +62,11 @@ export default function UserProfileDropdown({ show }) {
           <Pencil className="w-5 h-5 text-white" />
           <span>Update Profile</span>
         </button>
-        <button className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
+        <button onClick={() => navigate("/settings")} className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
           <Settings className="w-5 h-5 text-white" />
           <span>Settings</span>
         </button>
-        <button className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
+        <button onClick={() => navigate("/help-support")} className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
           <HelpCircle className="w-5 h-5 text-white" />
           <span>Help & Support</span>
         </button>

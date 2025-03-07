@@ -1,46 +1,125 @@
-import { Outlet, useNavigate } from "react-router-dom"
-import Navbar from "./Navbar"
-import Footer from "./Footer"
-import { useDispatch, useSelector } from "react-redux"
-import { useEffect } from "react"
-import axios from "axios"
-import { BASE_URL } from "../utils/constants"
-import {addUser} from "../utils/userSlice"
+import { Outlet } from "react-router-dom";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+import Sidebar from "./Sidebar";
+import { hideProfile } from "../utils/showProfileSlice";
 
 const Body = () => {
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-    const userData = useSelector((store) => store.user)
+  const dispatch = useDispatch()
+  // Define background options.
+  const backgroundOptions = [
+   {
+    value: "url('https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Abstract Code Background",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?ixlib=rb-1.2.1&auto=format&fit=crop&w=1949&q=80')",
+    label: "Tinder-like Image",
+  },
+  {
+  value: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNmZmYiLz48L3N2Zz4=')",
+  label: "White Background",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1517842645767-c639042777e0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "City Image",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Sunset Image",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1498036882173-b41c28a8ba34?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Code Editor Image",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Laptop on Desk",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Developer Workspace",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1515879218367-8466d910aaa4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Coffee and Code",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Night Sky with Stars",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Modern Office Space",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Developer Team Meeting",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1516321165247-4aa89a48be28?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Minimalist Desk Setup",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1516387938699-a93567ec168e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Coding on a Macbook",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Electronics and Circuits",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1518773553398-650c184e0bb3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Futuristic Technology",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1518773553398-650c184e0bb3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Neon Glow and Code",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1518773553398-650c184e0bb3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Dark Mode Code Editor",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1518773553398-650c184e0bb3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Abstract Digital Art",
+  },
+  {
+    value: "url('https://images.unsplash.com/photo-1518773553398-650c184e0bb3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+    label: "Minimalist White Desk",
+  },
+];
 
-    const  fetchUser = async () => {
-        if(userData) return
-        
-        try{
-            const res = await axios.get(BASE_URL + "/profile/view", {
-                withCredentials: true
-            })
-            
-            dispatch(addUser(res.data))
-        }catch(err){
-            console.log(err)
-        }
-    }
+  const [background, setBackground] = useState(backgroundOptions[0]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
 
-    useEffect(() => {
-        fetchUser()
-    }, [])
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
-    return(
-        <>
-            <div className="min-h-screen flex flex-col">
-                <Navbar />
-            <div className="flex-grow">
-                <Outlet />
+  return (
+   <div className="min-h-screen bg-cover bg-center transition-all duration-500"
+             style={{ backgroundImage: background.value }} // ✅ Applied dynamic background
+               onClick={() => {
+                   dispatch(hideProfile())
+                   setIsSidebarOpen(false)
+               }}>
+               <Navbar darkMode={darkMode} setDarkMode={setDarkMode} toggleSidebar={toggleSidebar} backgroundOptions={backgroundOptions}
+                onBackgroundChange={setBackground}/>
+   
+             <Sidebar isSidebarOpen={isSidebarOpen} />
+   
+             <main className={`transition-all duration-300 ${isSidebarOpen ? "ml-64" : "ml-0"}`}>
+               <div className="flex justify-center items-center min-h-screen pt-16">
+   
+        <Outlet />
+      
             </div>
-                <Footer />
-            </div>
-        </>
-    )
-}
+          </main>
+      <Footer />
+    </div>
+  );
+};
 
-export default Body
+export default Body;

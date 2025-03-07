@@ -15,9 +15,9 @@ const Login = () => {
         e.preventDefault();
         try {
             const response = await axios.post(BASE_URL + "/login", {email, password}, {withCredentials: true});
-            console.log(response.data.message)
             dispatch(hide());
             navigate("/");
+            console.log(response.data.message)
         } catch (error) {
             console.log("❌ Error logging in:", error.response?.data || error.message);
         }

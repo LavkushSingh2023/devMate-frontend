@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { show } from "../utils/showLoginSlice";
 import { toggleProfile } from "../utils/showProfileSlice";
-import Profile from "./Profile";
-import {setGlobalSearch} from "./UserCard"
+import Profile from "./UserProfileDropdown";
+import {setGlobalSearch} from "./Home"
 
 export default function Navbar({ darkMode, setDarkMode, toggleSidebar, backgroundOptions, onBackgroundChange }) {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -67,24 +67,65 @@ export default function Navbar({ darkMode, setDarkMode, toggleSidebar, backgroun
 
         {/* Notifications Dropdown */}
         <div className="relative">
+  <button
+    onClick={() => setShowNotifications(!showNotifications)}
+    className="p-2 rounded-full hover:bg-pink-300"
+  >
+    <Bell className="w-6 h-6 text-gray-700" />
+  </button>
+  {showNotifications && (
+    <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 animate-fadeIn">
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-3 border-b pb-2">
+          <h3 className="text-lg font-semibold text-gray-800">
+            Notifications
+          </h3>
           <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="p-2 rounded-full hover:bg-pink-300"
+            onClick={() => setShowNotifications(false)}
+            className="text-sm text-pink-500 hover:underline"
           >
-            <Bell className="w-6 h-6 text-gray-700" />
+            Dismiss All
           </button>
-          {showNotifications && (
-            <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg">
-              <div className="p-4">
-                <p className="text-sm font-semibold">Notifications</p>
-                <div className="mt-2 space-y-2">
-                  <div className="text-sm text-gray-600">New match with Jane!</div>
-                  <div className="text-sm text-gray-600">Mike liked your profile.</div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
+        <ul className="space-y-3">
+          <li className="flex items-start">
+            <img
+              src="https://via.placeholder.com/40"
+              alt="Jane"
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <div className="ml-3">
+              <p className="text-sm text-gray-700">
+                New match with{" "}
+                <span className="font-semibold text-gray-900">Jane</span>!
+              </p>
+              <p className="text-xs text-gray-500">5 mins ago</p>
+            </div>
+          </li>
+          <li className="flex items-start">
+            <img
+              src="https://via.placeholder.com/40"
+              alt="Mike"
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <div className="ml-3">
+              <p className="text-sm text-gray-700">
+                <span className="font-semibold text-gray-900">Mike</span> liked your profile.
+              </p>
+              <p className="text-xs text-gray-500">12 mins ago</p>
+            </div>
+          </li>
+        </ul>
+        <div className="mt-4 text-center">
+          <button className="text-sm text-pink-500 hover:underline">
+            View All Notifications
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
 
         {/* Profile Dropdown */}
         {showLogin ? (
