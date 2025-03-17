@@ -25,7 +25,7 @@ export default function App() {
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
           <Route path="updateProfile" element={<EditProfile user={user} />} />
-          <Route path="connectionRequests" element={<ConnectionRequests/>} />
+          <Route path="/:id/connectionRequests" element={<ConnectionRequests/>} />
           <Route path="myConnections" element={<MyConnections/>} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/help-support" element={<HelpSupportPage />} />

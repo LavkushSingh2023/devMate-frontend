@@ -49,7 +49,7 @@ export default function UserProfileDropdown({ show }) {
 
       {/* Menu Items */}
       <div className="p-2">
-        <button onClick={() => navigate("/connectionRequests")} className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
+        <button onClick={() => navigate(`/${user._id}/connectionRequests`)} className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
           <UserPlus className="w-5 h-5 text-white" />
           <span>Connection Requests</span>
           <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">3</span>

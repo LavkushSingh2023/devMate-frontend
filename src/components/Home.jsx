@@ -65,10 +65,16 @@ export default function Home() {
     setIndex(0);
   }, [search, profiles]);
 
-  const handleSwipe = (direction) => {
-    if (direction === "like") {
+  const handleSwipe = async (direction) => {
+    if (direction === "requested") {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
+    }
+    try {
+        const res = await axios.post(`${BASE_URL}/request/send/${direction}/${filterProfiles[index]._id}`, {}, { withCredentials: true })
+        console.log(res.data);
+    } catch (error) {
+        console.error(error.response.data);
     }
     setIndex((prev) => (prev + 1) % filterProfiles.length);
   };

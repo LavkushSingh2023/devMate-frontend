@@ -34,42 +34,18 @@ export default function ConnectionRequests({ onClose }) {
     }
   };
 
-  const dummyRequests = [
-    {
-      _id: "1",
-      avatar: "https://via.placeholder.com/150",
-      name: "Alice Johnson",
-      title: "Frontend Developer",
-    },
-    {
-      _id: "2",
-      avatar: "https://via.placeholder.com/150",
-      name: "Bob Smith",
-      title: "Backend Developer",
-    },
-    {
-      _id: "3",
-      avatar: "https://via.placeholder.com/150",
-      name: "Carol White",
-      title: "Full Stack Developer",
-    },
-    {
-      _id: "4",
-      avatar: "https://via.placeholder.com/150",
-      name: "David Brown",
-      title: "DevOps Engineer",
-    },
-    {
-      _id: "5",
-      avatar: "https://via.placeholder.com/150",
-      name: "Eva Green",
-      title: "UI/UX Designer",
-    },
-  ];
+  async function fetchConnectionRequests() {
+    const response = await axios.get(`${BASE_URL}/user/requests/received`, {withCredentials: true})
+    let allRequests = []
+    for(const req of response.data.connectionRequests){
+        const res = await axios.get(`${BASE_URL}/allRequests/${req.fromUserId._id}`, {withCredentials: true})
+        allRequests.push(res.data)
+    }
+    setRequests(allRequests)
+  }
 
   useEffect(() => {
-    // For testing, we set dummy data.
-    setRequests(dummyRequests);
+    fetchConnectionRequests()
   }, []);
 
    return (
@@ -119,7 +95,7 @@ export default function ConnectionRequests({ onClose }) {
                       <h3 className="text-lg font-semibold text-cyan-300">
                         {req.name}
                       </h3>
-                      <p className="text-sm text-cyan-400/80">{req.title}</p>
+                      <p className="text-sm text-cyan-400/80">{req.role}</p>
                     </div>
                     <div className="flex space-x-2">
                       <button
