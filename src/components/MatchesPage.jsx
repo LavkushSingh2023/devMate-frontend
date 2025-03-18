@@ -1,128 +1,113 @@
-import { Users, Search, Code, MessageSquare } from "lucide-react";
-import { useState } from "react";
+import { Users, Code } from "lucide-react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { BASE_URL } from "../utils/constants";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function MatchesPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [allMatches, setAllMatches] = useState([]);
+   const navigate = useNavigate();
+  const user = useSelector((state) => state.loggedInUser)
+  const userSkills = user?.skills?.flatMap(skill => skill.split(",").map(s => s.trim()))
 
-  const dummyMatches = [
-    {
-      id: 1,
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      name: "Alex Chen",
-      title: "Full Stack Developer",
-      techStack: ["React", "Node.js", "AWS"],
-      status: "new"
-    },
-    {
-      id: 2,
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-      name: "Sarah Johnson",
-      title: "Mobile Developer",
-      techStack: ["Swift", "Kotlin", "Firebase"],
-      status: "connected"
-    },
-    {
-      id: 3,
-      avatar: "https://randomuser.me/api/portraits/men/45.jpg",
-      name: "Raj Patel",
-      title: "DevOps Engineer",
-      techStack: ["Docker", "Kubernetes", "Terraform"],
-      status: "pending"
+  async function findAllMatches() {
+    const res = await axios.get(`${BASE_URL}/allUsers`, { withCredentials: true });
+    const users = res.data.filter((value) =>
+      value.skills[0]
+        .split(",")
+        .map((skill) => skill.trim())
+        .some((skill) => userSkills.includes(skill))
+    );
+    setAllMatches(users);
+  }
+
+  useEffect(() => {
+    findAllMatches();
+    console.log(userSkills)
+  }, []);
+
+  const calculateMatchPercentage = (profile) => {
+    let profileSkills = [];
+    if (profile.skills && profile.skills.length) {
+      profileSkills = profile.skills.flatMap((skillStr) =>
+        typeof skillStr === "string" ? skillStr.split(",").map((s) => s.trim()) : []
+      );
     }
-  ];
-
-  const filteredMatches = dummyMatches.filter(match =>
-    match.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    (activeFilter === "all" || match.status === activeFilter)
-  );
+    const commonSkills = profileSkills.filter((skill) =>
+      userSkills.some((filterSkill) => filterSkill.toLowerCase() === skill.toLowerCase())
+    );
+    return ((commonSkills.length / userSkills.length) * 100).toFixed(0);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 p-6">
+    <div className="rounded-2xl bg-gradient-to-br from-indigo-800 via-purple-800 to-blue-900 p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-cyan-300 flex items-center gap-2">
-            <Users className="w-8 h-8" />
+        <div className="flex items-center justify-between mb-12">
+          <h1 className="text-4xl font-bold text-white flex items-center gap-3">
+            <Users className="w-10 h-10 text-purple-300" />
             Developer Matches
           </h1>
         </div>
 
-        {/* Controls */}
-        <div className="bg-black/30 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/20 mb-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                placeholder="Search developers..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-black/40 border border-cyan-500/30 rounded-lg text-cyan-200 focus:outline-none focus:border-cyan-400"
-              />
-              <Search className="absolute left-3 top-2.5 w-5 h-5 text-cyan-400" />
-            </div>
-          </div>
-
-          {/* Filter Chips */}
-          <div className="flex gap-2 flex-wrap">
-            {["all", "new", "connected", "pending"].map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                className={`px-4 py-2 rounded-full text-sm ${
-                  activeFilter === filter
-                    ? "bg-cyan-600 text-cyan-100"
-                    : "bg-black/40 text-cyan-400 hover:bg-cyan-500/20"
-                } transition-colors`}
-              >
-                {filter.charAt(0).toUpperCase() + filter.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Matches Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMatches.map((match) => (
-            <div key={match.id} className="bg-black/30 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/20 hover:border-cyan-400/50 transition-colors">
-              <div className="flex items-start gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {allMatches.map((match) => (
+            <div
+              key={match._id}
+              className="bg-gray-900 rounded-2xl p-6 shadow-lg border border-transparent hover:border-purple-500 transition-all"
+            >
+              <div className="flex items-center gap-4 mb-5">
                 <img
                   src={match.avatar}
                   alt={match.name}
-                  className="w-14 h-14 rounded-full border-2 border-cyan-400 object-cover"
+                  className="w-16 h-16 rounded-full object-cover border-2 border-purple-500"
                 />
                 <div>
-                  <h3 className="text-lg font-semibold text-cyan-300">{match.name}</h3>
-                  <p className="text-cyan-400/80 text-sm">{match.title}</p>
+                  <h3 className="text-2xl font-semibold text-white">{match.name}</h3>
+                  <p className="text-gray-400">{match.role}</p>
                 </div>
               </div>
-              
+
               <div className="flex flex-wrap gap-2 mb-4">
-                {match.techStack.map((tech) => (
-                  <span key={tech} className="px-2 py-1 text-xs bg-cyan-500/10 text-cyan-400 rounded-full">
-                    {tech}
-                  </span>
-                ))}
+                {match.skills[0]
+                  .split(",")
+                  .map((tech) => tech.trim())
+                  .map((tech) => (
+                    <span
+                      key={tech}
+                      className="px-3 py-1 bg-purple-600/30 text-purple-300 rounded-full text-sm"
+                    >
+                      {tech}
+                    </span>
+                  ))}
               </div>
 
-              <div className="flex gap-2">
-                <button className="flex-1 py-2 px-4 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors">
-                  {match.status === "connected" ? "Message" : "Connect"}
+              {/* Match Percentage */}
+              <div className="mt-4">
+                <span className="inline-block px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-full">
+                  Match {calculateMatchPercentage(match)}%
+                </span>
+              </div>
+
+              {/* View Profile Button */}
+              <div className="mt-4">
+                <button
+                  onClick={() => navigate(`/profile/${match._id}`)}
+                  className="w-full py-2 px-4 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
+                >
+                  View Profile
                 </button>
-                {match.status === "pending" && (
-                  <button className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors">
-                    Cancel
-                  </button>
-                )}
               </div>
             </div>
           ))}
         </div>
 
-        {filteredMatches.length === 0 && (
-          <div className="text-center py-12 text-cyan-400/60">
+        {allMatches.length === 0 && (
+          <div className="text-center py-12 text-gray-400">
             <Code className="w-12 h-12 mx-auto mb-4" />
-            <p>No matches found matching your search</p>
+            <p>No matches found.</p>
           </div>
         )}
       </div>

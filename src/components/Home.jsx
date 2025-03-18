@@ -26,7 +26,11 @@ export default function Home() {
   const { width, height } = useWindowSize();
   const [profiles, setProfiles] = useState([]);
   const [filterProfiles, setFilterProfiles] = useState([]);
-  const [search, setSearch] = useState("");
+
+  const user = useSelector((state) => state.loggedInUser)
+  const userSkills = user?.skills[0].split(",").map(s => s.trim())
+
+   const [search, setSearch] = useState("");
 
   // Capture the setSearch function for global updates
   useSearch(setSearch);
@@ -36,16 +40,18 @@ export default function Home() {
 
   async function allUserFind() {
     try {
-      const allUsers = await axios.get(BASE_URL + "/allUsers", {
-        withCredentials: true,
-      });
-      setProfiles(allUsers.data);
-      setFilterProfiles(allUsers.data);
+      const allUsers = await axios.get(BASE_URL + "/feed", {withCredentials: true});
+      let feedUsers = []
+      for(let req of allUsers.data){
+        const res = await axios.get(`${BASE_URL}/allRequests/${req._id}`, {withCredentials: true})
+        feedUsers.push(res.data)
+      }
+      setFilterProfiles(feedUsers);
+
+      const res = await axios.get(`${BASE_URL}/allUsers`, {withCredentials: true})
+      setProfiles(res.data)
     } catch (error) {
-      console.log(
-        "Error in fetching allUserData: ",
-        error.response?.data || error.message
-      );
+      console.log("Error in fetching allUserData: ", error.response?.data || error.message);
     }
   }
 
@@ -63,7 +69,7 @@ export default function Home() {
     );
     setFilterProfiles(filtered);
     setIndex(0);
-  }, [search, profiles]);
+  }, [search]);
 
   const handleSwipe = async (direction) => {
     if (direction === "requested") {
@@ -72,7 +78,6 @@ export default function Home() {
     }
     try {
         const res = await axios.post(`${BASE_URL}/request/send/${direction}/${filterProfiles[index]._id}`, {}, { withCredentials: true })
-        console.log(res.data);
     } catch (error) {
         console.error(error.response.data);
     }
@@ -80,7 +85,6 @@ export default function Home() {
   };
 
   const calculateMatchPercentage = (profile) => {
-    const userSkills = ["React", "Node.js", "GraphQL"];
     let profileSkills = profile.skills;
     if (profileSkills.length && profileSkills[0].includes(",")) {
       profileSkills = profileSkills[0]
@@ -98,7 +102,7 @@ export default function Home() {
       <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
         <div
           className="bg-pink-500 h-2.5 rounded-full"
-          style={{ width: `${((index + 1) / profiles.length) * 100}%` }}
+          style={{ width: `${((index + 1) / filterProfiles.length) * 100}%` }}
         ></div>
       </div>
       <AnimatePresence>

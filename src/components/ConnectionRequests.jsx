@@ -8,29 +8,12 @@ export default function ConnectionRequests({ onClose }) {
   const [requests, setRequests] = useState([]);
   const navigate = useNavigate()
 
-  const handleAccept = async (id) => {
+  const handleRequest = async (review) => {
     try {
-      await axios.post(
-        `${BASE_URL}/connections/accept`,
-        { requestId: id },
-        { withCredentials: true }
-      );
-      setRequests(requests.filter((req) => req._id !== id));
+      const res = await axios.post(`${BASE_URL}/request/review/${review}`, {}, { withCredentials: true })
+      console.log(res.data)
     } catch (error) {
-      console.error("Error accepting request:", error.message);
-    }
-  };
-
-  const handleReject = async (id) => {
-    try {
-      await axios.post(
-        `${BASE_URL}/connections/reject`,
-        { requestId: id },
-        { withCredentials: true }
-      );
-      setRequests(requests.filter((req) => req._id !== id));
-    } catch (error) {
-      console.error("Error rejecting request:", error.message);
+      console.error("Error in reviewing request:", error.message);
     }
   };
 
@@ -99,13 +82,13 @@ export default function ConnectionRequests({ onClose }) {
                     </div>
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleAccept(req._id)}
+                        onClick={() => handleRequest('accepted')}
                         className="p-2 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
                       >
                         <Check className="w-5 h-5 text-white" />
                       </button>
                       <button
-                        onClick={() => handleReject(req._id)}
+                        onClick={() => handleRequest('rejected')}
                         className="p-2 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
                       >
                         <XCircle className="w-5 h-5 text-white" />
@@ -120,7 +103,7 @@ export default function ConnectionRequests({ onClose }) {
       </div>
 
       {/* Glow Effects */}
-      <style jsx>{`
+      <style>{`
         .neon-glow {
           box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);
           transition: box-shadow 0.3s ease;
