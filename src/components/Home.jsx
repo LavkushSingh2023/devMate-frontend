@@ -28,7 +28,7 @@ export default function Home() {
   const [filterProfiles, setFilterProfiles] = useState([]);
 
   const user = useSelector((state) => state.loggedInUser)
-  const userSkills = user?.skills[0].split(",").map(s => s.trim())
+  const userSkills = user?.skills?.[0]?.split(",").map(s => s.trim())
 
    const [search, setSearch] = useState("");
 
