@@ -17,14 +17,13 @@ export default function MatchesPage() {
       value.skills[0]
         .split(",")
         .map((skill) => skill.trim())
-        .some((skill) => userSkills.includes(skill))
+        .some((skill) => userSkills?.includes(skill))
     );
     setAllMatches(users);
   }
 
   useEffect(() => {
     findAllMatches();
-    console.log(userSkills)
   }, []);
 
   const calculateMatchPercentage = (profile) => {

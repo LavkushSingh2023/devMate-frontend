@@ -28,7 +28,7 @@ export default function Home() {
   const [filterProfiles, setFilterProfiles] = useState([]);
 
   const user = useSelector((state) => state.loggedInUser)
-  const userSkills = user?.skills?.[0]?.split(",").map(s => s.trim())
+  const userSkills = user?.skills?.[0]?.split(",").map(s => s.trim()) || []
 
    const [search, setSearch] = useState("");
 
@@ -86,13 +86,13 @@ export default function Home() {
 
   const calculateMatchPercentage = (profile) => {
     let profileSkills = profile.skills;
-    if (profileSkills.length && profileSkills[0].includes(",")) {
+    if (profileSkills.length && profileSkills[0]?.includes(",")) {
       profileSkills = profileSkills[0]
         .split(",")
         .map((skill) => skill.trim());
     }
     const commonSkills = profileSkills.filter((skill) =>
-      userSkills.includes(skill)
+      userSkills?.includes(skill)
     );
     return ((commonSkills.length / userSkills.length) * 100).toFixed(0);
   };

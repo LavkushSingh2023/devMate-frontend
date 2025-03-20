@@ -5,6 +5,7 @@ import { show } from "../utils/showLoginSlice";
 import { toggleProfile } from "../utils/showProfileSlice";
 import Profile from "./UserProfileDropdown";
 import {setGlobalSearch} from "./Home"
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar({ darkMode, setDarkMode, toggleSidebar, backgroundOptions, onBackgroundChange }) {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -12,6 +13,7 @@ export default function Navbar({ darkMode, setDarkMode, toggleSidebar, backgroun
   const showLogin = useSelector((state) => state.login.showLogin);
   const showProfile = useSelector((state) => state.profile.showProfile);
   const dispatch = useDispatch();
+  const navigate = useNavigate()
 
   // Function to handle background change
   const handleThemeChange = () => {
@@ -131,7 +133,10 @@ export default function Navbar({ darkMode, setDarkMode, toggleSidebar, backgroun
         {showLogin ? (
           <div className="relative">
             <button
-              onClick={() => dispatch(show())}
+              onClick={() => {
+                dispatch(show())
+                navigate("/login")
+            }}
               className="px-6 py-2 text-lg font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105"
             >
               Log In
