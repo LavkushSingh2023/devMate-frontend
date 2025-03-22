@@ -1,11 +1,31 @@
 import { HelpCircle, Mail, AlertTriangle, BookOpen } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios"
+import { BASE_URL } from "../utils/constants";
 
 export default function HelpSupportPage() {
-  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: "", subject: "", message: "" });
+  const [status, setStatus] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("Sending...");
+
+    try {
+      await axios.post(`${BASE_URL}/send-email`, formData);
+      setStatus("Message sent!");
+      setFormData({ email: "", subject: "", message: "" });
+    } catch (error) {
+      setStatus("Error sending message.");
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 p-6">
+    <div className="min-h-screen w-2/5 max-w-screen-xl bg-gradient-to-br from-gray-900 to-blue-900 p-6 mt-12 rounded-2xl">
       <div className="max-w-3xl mx-auto bg-black/30 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-500/20 p-6">
         {/* Header */}
         <div className="flex items-center space-x-3 mb-8">
@@ -39,11 +59,14 @@ export default function HelpSupportPage() {
               <Mail className="w-5 h-5" />
               <span>Contact Support</span>
             </h2>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-cyan-200 text-sm mb-2">Your Email</label>
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full bg-black/30 border border-cyan-500/30 rounded-lg px-4 py-2 text-cyan-200 focus:outline-none focus:border-cyan-400"
                   placeholder="Enter your email"
                 />
@@ -52,6 +75,9 @@ export default function HelpSupportPage() {
                 <label className="block text-cyan-200 text-sm mb-2">Subject</label>
                 <input
                   type="text"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
                   className="w-full bg-black/30 border border-cyan-500/30 rounded-lg px-4 py-2 text-cyan-200 focus:outline-none focus:border-cyan-400"
                   placeholder="Enter subject"
                 />
@@ -60,11 +86,14 @@ export default function HelpSupportPage() {
                 <label className="block text-cyan-200 text-sm mb-2">Message</label>
                 <textarea
                   rows="4"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   className="w-full bg-black/30 border border-cyan-500/30 rounded-lg px-4 py-2 text-cyan-200 focus:outline-none focus:border-cyan-400"
                   placeholder="Describe your issue"
                 ></textarea>
               </div>
-              <button className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition duration-200 flex items-center space-x-2">
+              <button type="submit" className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition duration-200 flex items-center space-x-2">
                 <AlertTriangle className="w-5 h-5" />
                 <span>Send Message</span>
               </button>

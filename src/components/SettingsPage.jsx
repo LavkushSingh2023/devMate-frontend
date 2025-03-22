@@ -1,11 +1,9 @@
 import { Settings, Lock, Bell, Shield, EyeOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 export default function SettingsPage() {
-  const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 p-6 mt-12 rounded-2xl">
       <div className="max-w-3xl mx-auto bg-black/30 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-500/20 p-6">
         {/* Header */}
         <div className="flex items-center space-x-3 mb-8">
