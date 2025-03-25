@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
 import axios from "axios";
 import { Check, XCircle } from "lucide-react";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
+import { findRequests } from "./UserProfileDropdown";
 
 export default function ConnectionRequests({ onClose }) {
-  const [requests, setRequests] = useState([]);
   const navigate = useNavigate()
 
+  const requests = findRequests()
+  
   const handleRequest = async (review) => {
     try {
       const res = await axios.post(`${BASE_URL}/request/review/${review}`, {}, { withCredentials: true })
@@ -16,20 +17,6 @@ export default function ConnectionRequests({ onClose }) {
       console.error("Error in reviewing request:", error.message);
     }
   };
-
-  async function fetchConnectionRequests() {
-    const response = await axios.get(`${BASE_URL}/user/requests/received`, {withCredentials: true})
-    let allRequests = []
-    for(const req of response.data.connectionRequests){
-        const res = await axios.get(`${BASE_URL}/allRequests/${req.fromUserId._id}`, {withCredentials: true})
-        allRequests.push(res.data)
-    }
-    setRequests(allRequests)
-  }
-
-  useEffect(() => {
-    fetchConnectionRequests()
-  }, []);
 
    return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/90 backdrop-blur-lg">

@@ -1,19 +1,29 @@
 import axios from "axios";
 import { LogOut, UserPlus, Users, Settings, Pencil, HelpCircle } from "lucide-react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addUser } from "../utils/userSlice";
 import { handleLogOut } from "./Sidebar";
 import { BASE_URL } from "../utils/constants";
 
+let reqs;
+function updateReqs(value){
+    reqs = value
+}
+export function findRequests(){
+    if(reqs){
+        return reqs
+    }
+}
+
 export default function UserProfileDropdown({ show }) {
+    const [requests, setRequests] = useState([]);
      const navigate = useNavigate()
      const dispatch = useDispatch()
 
     const showLogin = useSelector((state) => state.login.showLogin)   
-    const user = useSelector((state) => state.loggedInUser)
-    
+    const user = useSelector((state) => state.loggedInUser)    
 
     async function findLogInUser() {
         try{
@@ -27,6 +37,24 @@ export default function UserProfileDropdown({ show }) {
     useEffect(() => {
         findLogInUser()
     },[showLogin])
+
+    async function fetchConnectionRequests() {
+        const response = await axios.get(`${BASE_URL}/user/requests/received`, {withCredentials: true})
+        let allRequests = []
+        for(const req of response.data.connectionRequests){
+            const res = await axios.get(`${BASE_URL}/allRequests/${req.fromUserId._id}`, {withCredentials: true})
+            allRequests.push(res.data)
+        }
+        setRequests(allRequests)
+    }
+
+    useEffect(() => {
+        fetchConnectionRequests()
+    }, []);
+
+    useEffect(() => {
+        updateReqs(requests)
+    }, [requests])
 
   return (
     <div onClick={(e) => {e.stopPropagation()}} className="absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-600 to-indigo-700 dark:from-blue-800 dark:to-indigo-900 rounded-lg shadow-xl overflow-hidden transition duration-200 ease-in-out">
@@ -52,7 +80,7 @@ export default function UserProfileDropdown({ show }) {
         <button onClick={() => navigate(`/${user._id}/connectionRequests`)} className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
           <UserPlus className="w-5 h-5 text-white" />
           <span>Connection Requests</span>
-          <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">3</span>
+          <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{requests.length}</span>
         </button>
         <button onClick={() => navigate("/myConnections")} className="w-full flex items-center space-x-2 p-3 text-sm text-white hover:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition">
           <Users className="w-5 h-5 text-white" />
