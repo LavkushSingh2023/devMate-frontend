@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { show } from "../utils/showLoginSlice";
 import { toggleProfile } from "../utils/showProfileSlice";
 import Profile from "./UserProfileDropdown";
-import {setGlobalSearch} from "./Home"
+// import {setGlobalSearch} from "./Home"
+import { setSearch } from "../utils/searchSlice";
 import { useNavigate } from "react-router-dom";
 
 export default function Navbar({ darkMode, setDarkMode, toggleSidebar, backgroundOptions, onBackgroundChange }) {
@@ -48,7 +49,7 @@ export default function Navbar({ darkMode, setDarkMode, toggleSidebar, backgroun
             className="text-gray-700 ml-2 bg-transparent outline-none w-full"
             // name="search"
             // value={search}
-            onChange={(e) => setGlobalSearch(e.target.value)}
+            onChange={(e) => dispatch(setSearch(e.target.value))}
           />
         </div>
       )}

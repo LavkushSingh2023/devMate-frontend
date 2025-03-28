@@ -7,18 +7,19 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
+import {setSearch} from "../utils/searchSlice"
 
 
-let updateSearch;
-function useSearch(setSearch) {
-  updateSearch = setSearch;
-}
+// let updateSearch;
+// function useSearch(setSearch) {
+//   updateSearch = setSearch;
+// }
 
-export function setGlobalSearch(value) {
-  if (updateSearch) {
-    updateSearch(value);
-  }
-}
+// export function setGlobalSearch(value) {
+//   if (updateSearch) {
+//     updateSearch(value);
+//   }
+// }
 
 export default function Home() {
   const [index, setIndex] = useState(0);
@@ -30,10 +31,11 @@ export default function Home() {
   const user = useSelector((state) => state.loggedInUser)
   const userSkills = user?.skills?.[0]?.split(",").map(s => s.trim()) || []
 
-   const [search, setSearch] = useState("");
+//    const [search, setSearch] = useState("");
+  const search = useSelector((state) => state.searchProfile.search)
 
   // Capture the setSearch function for global updates
-  useSearch(setSearch);
+//   useSearch(setSearch);
 
   const showLogin = useSelector((state) => state.login?.showLogin);
   const navigate = useNavigate();
@@ -65,11 +67,11 @@ export default function Home() {
 
   useEffect(() => {
     const filtered = profiles.filter((user) =>
-      user.name.toLowerCase().includes(search.toLowerCase())
+      user.name.toLowerCase().includes(search?.toLowerCase())
     );
     setFilterProfiles(filtered);
     setIndex(0);
-  }, [search]);
+  }, [search, profiles]);
 
   const handleSwipe = async (direction) => {
     if (direction === "requested") {

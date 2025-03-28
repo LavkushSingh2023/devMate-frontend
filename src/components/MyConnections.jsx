@@ -3,10 +3,13 @@ import axios from "axios";
 import { User, ChevronRight, XCircle } from "lucide-react";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
+import { setSearch } from "../utils/searchSlice";
+import {useDispatch} from "react-redux"
 
 export default function MyConnections() {
   const [connections, setConnections] = useState([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   async function findConnections() {
     const response = await axios.get(`${BASE_URL}/user/connections`, { withCredentials: true });
@@ -79,7 +82,10 @@ export default function MyConnections() {
                   </div>
                 </div>
                 <div className="mt-4 pt-4 border-t border-gray-300">
-                  <button className="w-full flex items-center justify-between p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <button onClick={() => {
+                    navigate("/")
+                    dispatch(setSearch(conn.name))
+                  }} className="w-full flex items-center justify-between p-2 hover:bg-gray-100 rounded-lg transition-colors">
                     <span className="text-sm text-purple-800">View Profile</span>
                     <ChevronRight className="w-5 h-5 text-purple-800" />
                   </button>

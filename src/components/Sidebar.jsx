@@ -5,6 +5,7 @@ import { removeUser } from "../utils/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
+import {setSearch} from "../utils/searchSlice"
 
 export async function handleLogOut(dispatch, navigate) {
   try {
@@ -19,6 +20,7 @@ export async function handleLogOut(dispatch, navigate) {
 
 export default function Sidebar({ isSidebarOpen }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
   const user = useSelector((state) => state.loggedInUser);
 
   const navItems = [
@@ -53,7 +55,12 @@ export default function Sidebar({ isSidebarOpen }) {
         {navItems.map((item) => (
           <button
             key={item.label}
-            onClick={() => navigate(item.path)}
+            onClick={() => {
+                if(item.path == "/"){
+                    dispatch(setSearch(""))
+                }
+                navigate(item.path)
+            }}
             className="w-full flex items-center p-3 rounded-lg hover:bg-blue-800/40 transition-all group"
           >
             <item.icon className="w-6 h-6 text-pink-300 group-hover:text-pink-200" />

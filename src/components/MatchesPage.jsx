@@ -3,13 +3,15 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import {setSearch} from "../utils/searchSlice"
 
 export default function MatchesPage() {
   const [allMatches, setAllMatches] = useState([]);
    const navigate = useNavigate();
   const user = useSelector((state) => state.loggedInUser)
   const userSkills = user?.skills?.flatMap(skill => skill.split(",").map(s => s.trim()))
+  const dispatch = useDispatch()
 
   async function findAllMatches() {
     const res = await axios.get(`${BASE_URL}/allUsers`, { withCredentials: true });
@@ -93,7 +95,10 @@ export default function MatchesPage() {
               {/* View Profile Button */}
               <div className="mt-4">
                 <button
-                  onClick={() => navigate(`/profile/${match._id}`)}
+                  onClick={() => {
+                    navigate(`/`)
+                    dispatch(setSearch(match.name))
+                    }}
                   className="w-full py-2 px-4 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
                 >
                   View Profile
