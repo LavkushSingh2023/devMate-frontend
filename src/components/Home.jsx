@@ -7,8 +7,6 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import {setSearch} from "../utils/searchSlice"
-
 
 // let updateSearch;
 // function useSearch(setSearch) {
@@ -42,14 +40,6 @@ export default function Home() {
 
   async function allUserFind() {
     try {
-      const allUsers = await axios.get(BASE_URL + "/feed", {withCredentials: true});
-      let feedUsers = []
-      for(let req of allUsers.data){
-        const res = await axios.get(`${BASE_URL}/allRequests/${req._id}`, {withCredentials: true})
-        feedUsers.push(res.data)
-      }
-      setFilterProfiles(feedUsers);
-
       const res = await axios.get(`${BASE_URL}/allUsers`, {withCredentials: true})
       setProfiles(res.data)
     } catch (error) {
@@ -57,19 +47,37 @@ export default function Home() {
     }
   }
 
+  async function feedUserFind() {
+    try {
+      const allUsers = await axios.get(BASE_URL + "/feed", {withCredentials: true});
+      let feedUsers = []
+      for(let req of allUsers.data){
+        const res = await axios.get(`${BASE_URL}/allRequests/${req._id}`, {withCredentials: true})
+        feedUsers.push(res.data)
+      }
+      setFilterProfiles(feedUsers);
+    } catch (error) {
+      console.log("Error in fetching feedUserData: ", error.response?.data || error.message);
+    }
+  }
+
   useEffect(() => {
     if (showLogin) {
       navigate("/login");
     }else{
-        allUserFind();
+        allUserFind()
     }
   }, [showLogin]);
 
-  useEffect(() => {
-    const filtered = profiles.filter((user) =>
-      user.name.toLowerCase().includes(search?.toLowerCase())
-    );
-    setFilterProfiles(filtered);
+useEffect(() => {
+    if(search){
+        const filtered = profiles.filter((user) =>
+            user.name.toLowerCase().includes(search.toLowerCase())
+        );
+        setFilterProfiles(filtered);
+    }else{
+        feedUserFind()
+    }
     setIndex(0);
   }, [search, profiles]);
 

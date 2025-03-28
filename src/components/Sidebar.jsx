@@ -1,6 +1,5 @@
 import axios from "axios";
 import { Home, Users, MessageSquare, Settings, LogOut, PenSquare } from "lucide-react";
-import { useState } from "react";
 import { removeUser } from "../utils/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -57,7 +56,7 @@ export default function Sidebar({ isSidebarOpen }) {
             key={item.label}
             onClick={() => {
                 if(item.path == "/"){
-                    dispatch(setSearch(""))
+                    dispatch(setSearch(null))
                 }
                 navigate(item.path)
             }}
