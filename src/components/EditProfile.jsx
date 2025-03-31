@@ -75,13 +75,13 @@ const UpdateProfile = ({ user }) => {
               <Camera className="w-5 h-5" />
             </button>
             {showAvatarOptions && (
-              <div className="absolute top-full mt-2 bg-gray-800 border border-gray-700 rounded-lg p-2 z-10">
+              <div className="absolute top-full mx-36 my-[-80px] bg-gray-800 border border-gray-700 rounded-lg p-2 z-10">
                 <button
                   onClick={() => {
                     setShowAvatarOptions(false);
                     handleUploadClick(); // Open file picker
                   }}
-                  className="block w-full text-left px-3 py-1 hover:bg-gray-700"
+                  className="block w-32 text-left px-3 py-1 hover:bg-blue-500 rounded-lg bg-blue-700 mb-4"
                 >
                   Upload from Computer
                 </button>
@@ -90,7 +90,7 @@ const UpdateProfile = ({ user }) => {
                     setShowAvatarOptions(false);
                     setEnterUrl(true);
                   }}
-                  className="block w-full text-left px-3 py-1 hover:bg-gray-700"
+                  className="block w-32 text-left px-3 py-1 hover:bg-blue-500 rounded-lg bg-blue-700"
                 >
                   Enter Image URL
                 </button>

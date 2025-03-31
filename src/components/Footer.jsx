@@ -59,7 +59,7 @@ export default function Footer() {
 
         {/* Copyright Notice */}
         <div className="text-center text-sm text-gray-400">
-          © 2023 devMate. All rights reserved.
+          © 2025 devMate. All rights reserved.
         </div>
 
         {/* Back to Top Button */}

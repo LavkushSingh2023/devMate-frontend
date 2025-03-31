@@ -19,7 +19,7 @@ export default function MyConnections() {
       const res = await axios.get(`${BASE_URL}/allRequests/${id}`, { withCredentials: true });
       fetchedConnections.push(res.data);
     }
-    setConnections(fetchedConnections);
+    setConnections(fetchedConnections)
   }
 
   useEffect(() => {

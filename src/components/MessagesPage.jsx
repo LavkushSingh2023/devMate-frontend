@@ -1,100 +1,122 @@
 import { MessageSquare, Send, Users } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import io from "socket.io-client";
+import axios from "axios";
+import { BASE_URL } from "../utils/constants"; // e.g. "http://localhost:3000" for dev
 
 export default function MessagesPage() {
   const [activeChat, setActiveChat] = useState(null);
   const [newMessage, setNewMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [connections, setConnections] = useState([]);
+  const socketRef = useRef();
 
-  const dummyConversations = [
-    {
-      id: 1,
-      user: {
-        avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-        name: "Alex Chen",
-        online: true,
-      },
-      lastMessage: "Hey, did you check out the new React docs?",
-      timestamp: "2h ago",
-      unread: 3,
-    },
-    {
-      id: 2,
-      user: {
-        avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-        name: "Sarah Johnson",
-        online: false,
-      },
-      lastMessage: "Let's schedule the code review",
-      timestamp: "5h ago",
-      unread: 0,
-    },
-    // You can add more dummy conversations here...
-  ];
+  async function findConnections() {
+    try {
+      const response = await axios.get(`${BASE_URL}/user/connections`, {
+        withCredentials: true,
+      });
+      let fetchedConnections = [];
+      for (let item of response.data.data) {
+        const id = typeof item === "object" && item._id ? item._id : item;
+        const res = await axios.get(`${BASE_URL}/allRequests/${id}`, {
+          withCredentials: true,
+        });
+        fetchedConnections.push(res.data);
+      }
+      setConnections(fetchedConnections);
+    } catch (error) {
+      console.error("Error fetching connections:", error);
+    }
+  }
 
-  const dummyMessages = [
-    {
-      id: 1,
-      text: "Hey, did you check out the new React docs?",
-      sender: "Alex",
-      timestamp: "2:45 PM",
-    },
-    {
-      id: 2,
-      text: "Not yet, any particular section I should look at?",
+  useEffect(() => {
+    findConnections();
+  }, []);
+
+  // Connect to Socket.IO server using BASE_URL.
+  useEffect(() => {
+    socketRef.current = io(BASE_URL);
+    socketRef.current.on("message", (message) => {
+      // Only add messages relevant to the active chat.
+      if (message.chatId === activeChat) {
+        setMessages((prev) => {
+          if (prev.find((m) => m.id === message.id)) return prev;
+          return [...prev, message];
+        });
+      }
+    });
+    return () => socketRef.current.disconnect();
+  }, [activeChat]);
+
+  const sendMessage = () => {
+    if (!newMessage.trim() || !activeChat) return;
+    const messageData = {
+      id: `${Date.now()}-${Math.random()}`, // Composite unique id.
+      text: newMessage,
       sender: "me",
-      timestamp: "2:47 PM",
-    },
-    // Add more messages as needed...
-  ];
+      timestamp: new Date().toLocaleTimeString(),
+      chatId: activeChat,
+    };
+    socketRef.current.emit("message", messageData);
+    setNewMessage("");
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 p-6">
-      <div className="max-w-6xl mx-auto bg-black/30 backdrop-blur-sm rounded-xl border border-cyan-500/20 shadow-lg overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-800 to-indigo-800 p-6 mt-6 rounded-xl">
+      <div className="max-w-6xl mx-auto bg-gradient-to-r from-indigo-900 to-purple-900 backdrop-blur-xl rounded-xl border border-indigo-800 shadow-2xl overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-3">
           {/* Conversations List */}
           <div className="col-span-1 border-r border-cyan-500/20">
             <div className="p-4 border-b border-cyan-500/20">
               <h2 className="text-xl font-semibold text-cyan-300 flex items-center gap-2">
-                <Users className="w-6 h-6" />
-                Conversations
+                <Users className="w-6 h-6" /> Conversations
               </h2>
             </div>
             <div className="overflow-y-auto h-[70vh]">
-              {dummyConversations.map((convo) => (
-                <div
-                  key={convo.id}
-                  onClick={() => setActiveChat(convo.id)}
-                  className={`p-4 border-b border-cyan-500/10 cursor-pointer transition-colors 
-                    ${activeChat === convo.id ? "bg-cyan-500/10" : "hover:bg-cyan-500/5"}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <img
-                        src={convo.user.avatar}
-                        alt={convo.user.name}
-                        className="w-12 h-12 rounded-full border-2 border-cyan-400"
-                      />
-                      {convo.user.online && (
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-cyan-300">{convo.user.name}</h3>
-                      <p className="text-sm text-cyan-400/80 truncate">
-                        {convo.lastMessage}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-cyan-500">{convo.timestamp}</p>
-                      {convo.unread > 0 && (
-                        <span className="mt-1 inline-block px-2 py-1 text-xs bg-cyan-600 text-white rounded-full">
-                          {convo.unread}
-                        </span>
-                      )}
+              {connections.length > 0 ? (
+                connections.map((convo) => (
+                  <div
+                    key={convo._id}
+                    onClick={() => {
+                      setActiveChat(convo._id);
+                      setMessages([]); // Reset messages on chat switch.
+                    }}
+                    className={`p-4 border-b border-cyan-500/10 cursor-pointer transition-colors ${
+                      activeChat === convo._id
+                        ? "bg-cyan-500/10"
+                        : "hover:bg-cyan-500/5"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Fixed-size container for avatar */}
+                      <div className="relative flex-shrink-0 w-12 h-12 bg-gray-600 rounded-full">
+                        {convo.avatar ? (
+                            <img
+                            src={convo.avatar}
+                            alt={convo.name}
+                            className="block w-full h-full rounded-full border-2 border-cyan-400 object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full rounded-full bg-cyan-900 flex items-center justify-center">
+                            <UserIcon className="w-6 h-6 text-cyan-400" />
+                            </div>
+                        )}
+                        </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium text-cyan-300">
+                          {convo.name}
+                        </h3>
+                        <p className="text-sm text-cyan-400/80 truncate">
+                          {convo.bio || ""}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-gray-300 p-4">No connections found.</p>
+              )}
             </div>
           </div>
 
@@ -104,25 +126,27 @@ export default function MessagesPage() {
               <div className="flex flex-col h-[70vh]">
                 {/* Chat Header */}
                 <div className="p-4 border-b border-cyan-500/20 flex items-center">
-                  <img
-                    src={
-                      dummyConversations.find((c) => c.id === activeChat)?.user.avatar
-                    }
-                    alt={
-                      dummyConversations.find((c) => c.id === activeChat)?.user.name
-                    }
-                    className="w-10 h-10 rounded-full border-2 border-cyan-400 mr-3"
-                  />
-                  <h3 className="text-lg font-semibold text-cyan-300">
-                    {
-                      dummyConversations.find((c) => c.id === activeChat)?.user.name
-                    }
-                  </h3>
+                  {connections
+                    .filter((c) => c._id === activeChat)
+                    .map((convo) => (
+                      <div key={convo._id} className="flex items-center">
+                        <div className="relative w-10 h-10">
+                          <img
+                            src={convo.avatar}
+                            alt={convo.name}
+                            className="w-full h-full rounded-full border-2 border-cyan-400 object-cover mr-3"
+                          />
+                        </div>
+                        <h3 className="text-lg font-semibold text-cyan-300">
+                          {convo.name}
+                        </h3>
+                      </div>
+                    ))}
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {dummyMessages.map((message) => (
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 mx-12">
+                  {messages.map((message) => (
                     <div
                       key={message.id}
                       className={`flex ${
@@ -154,8 +178,12 @@ export default function MessagesPage() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Type your message..."
                       className="flex-1 bg-black/40 border border-cyan-500/30 rounded-lg px-4 py-2 text-cyan-200 focus:outline-none focus:border-cyan-400"
+                      onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                     />
-                    <button className="p-3 bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors">
+                    <button
+                      onClick={sendMessage}
+                      className="p-3 bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
+                    >
                       <Send className="w-5 h-5 text-white" />
                     </button>
                   </div>
