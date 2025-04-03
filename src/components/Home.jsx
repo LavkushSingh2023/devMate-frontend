@@ -65,7 +65,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if (!user) {
+    if (showLogin) {
       navigate("/login");
     }else{
         allUserFind()
