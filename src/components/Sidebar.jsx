@@ -5,11 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import {setSearch} from "../utils/searchSlice"
+import { show } from "../utils/showLoginSlice"
 
 export async function handleLogOut(dispatch, navigate) {
   try {
     const response = await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
     dispatch(removeUser());
+    dispatch(show())
     navigate("/login");
     console.log(response.data);
   } catch (error) {

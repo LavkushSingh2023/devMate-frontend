@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import Confetti from "react-confetti";
 import useWindowSize from "react-use/lib/useWindowSize";
 import ProfileCard from "./ProfileCard";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
+import { hide } from "../utils/showLoginSlice";
 
 // let updateSearch;
 // function useSearch(setSearch) {
@@ -25,6 +26,7 @@ export default function Home() {
   const { width, height } = useWindowSize();
   const [profiles, setProfiles] = useState([]);
   const [filterProfiles, setFilterProfiles] = useState([]);
+  const dispatch = useDispatch();
 
   const user = useSelector((state) => state.loggedInUser)
   const userSkills = user?.skills?.[0]?.split(",").map(s => s.trim()) || []
@@ -42,6 +44,7 @@ export default function Home() {
     try {
       const res = await axios.get(`${BASE_URL}/allUsers`, {withCredentials: true})
       setProfiles(res.data)
+      dispatch(hide())
     } catch (error) {
       console.log("Error in fetching allUserData: ", error.response?.data || error.message);
     }
@@ -62,7 +65,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if (showLogin) {
+    if (!user) {
       navigate("/login");
     }else{
         allUserFind()
