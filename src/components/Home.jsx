@@ -65,6 +65,12 @@ export default function Home() {
   }
 
   useEffect(() => {
+    if(showLogin){
+        navigate("/login")
+    }
+  },[])
+
+  useEffect(() => {
     if(user){
         dispatch(hide())
     }

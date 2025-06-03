@@ -16,7 +16,7 @@ import { addUser } from "./utils/userSlice";
 import { useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "./utils/constants";
-import { hide } from "./utils/showLoginSlice"
+import { hide, show } from "./utils/showLoginSlice"
 
 export default function App() {
   const user = useSelector((state) => state.loggedInUser);
@@ -25,7 +25,7 @@ export default function App() {
    const validateUser = async () => {
       try {
         const response = await axios.get(BASE_URL + "/auth/validate", { withCredentials: true });
-        if (response.data && response.data.user) {
+        if (response?.data && response?.data?.user) {
           dispatch(addUser(response.data.user)); // Update Redux state
           dispatch(hide())
         }
